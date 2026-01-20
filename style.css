@@ -1,10 +1,11 @@
 body {
-    background-color: #FCE4EC; /* Lightest pink */
-    font-family: 'Arial', sans-serif;
+    background-color: #FCE4EC;
+    color: #880E4F;
+    font-family: 'Segoe UI', Arial, sans-serif;
     display: flex;
     justify-content: center;
+    margin: 0;
     padding: 20px;
-    color: #880E4F;
 }
 
 .app-container {
@@ -15,24 +16,26 @@ body {
 
 .card {
     background-color: #FFF1F1;
-    padding: 20px;
-    border-radius: 15px;
-    min-height: 200px;
-    margin-bottom: 10px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    white-space: pre-wrap; /* Keeps the line breaks from your pattern */
+    border-radius: 20px;
+    padding: 25px;
+    min-height: 250px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+    white-space: pre-wrap;
+    text-align: left;
+    line-height: 1.6;
 }
 
-.progress-bar-bg {
-    background-color: #FFF1F1;
+.progress-bg {
+    background: #FFF1F1;
     height: 15px;
     border-radius: 10px;
     margin: 10px 0;
     overflow: hidden;
 }
 
-.progress-bar-fill {
-    background-color: #F06292; /* Hot pink */
+#shaping-bar {
+    background: #F06292;
     height: 100%;
     width: 0%;
     transition: width 0.3s;
@@ -41,17 +44,50 @@ body {
 button {
     background-color: #F8BBD0;
     border: none;
-    padding: 10px 15px;
-    border-radius: 8px;
     color: #880E4F;
-    cursor: pointer;
+    padding: 12px 20px;
+    border-radius: 10px;
     font-weight: bold;
+    cursor: pointer;
     margin: 5px;
 }
 
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 #next-btn {
-    background-color: #90CAF9; /* Blue contrast */
+    background-color: #90CAF9;
     color: white;
 }
 
+.row-count {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 0 15px;
+}
+
+#reminder-label {
+    font-size: 1.2rem;
+    font-weight: bold;
+    margin: 15px 0;
+    min-height: 1.5em;
+}
+
 .hidden { display: none; }
+
+.reset-link {
+    background: none;
+    text-decoration: underline;
+    font-size: 0.8rem;
+    color: #AD1457;
+    margin-top: 20px;
+}
+
+#confetti-canvas {
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 999;
+}
