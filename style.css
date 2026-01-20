@@ -1,0 +1,57 @@
+body {
+    background-color: #FCE4EC; /* Lightest pink */
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+    color: #880E4F;
+}
+
+.app-container {
+    width: 100%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.card {
+    background-color: #FFF1F1;
+    padding: 20px;
+    border-radius: 15px;
+    min-height: 200px;
+    margin-bottom: 10px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    white-space: pre-wrap; /* Keeps the line breaks from your pattern */
+}
+
+.progress-bar-bg {
+    background-color: #FFF1F1;
+    height: 15px;
+    border-radius: 10px;
+    margin: 10px 0;
+    overflow: hidden;
+}
+
+.progress-bar-fill {
+    background-color: #F06292; /* Hot pink */
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s;
+}
+
+button {
+    background-color: #F8BBD0;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: #880E4F;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 5px;
+}
+
+#next-btn {
+    background-color: #90CAF9; /* Blue contrast */
+    color: white;
+}
+
+.hidden { display: none; }

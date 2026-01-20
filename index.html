@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sophie Hood Knitting Guide</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <div id="text-box" class="card">
+            <p id="step-text">Loading...</p>
+        </div>
+        
+        <p id="progress-label"></p>
+
+        <div id="shaping-frame" class="hidden">
+            <p id="shaping-label"></p>
+            <div class="progress-bar-bg">
+                <div id="shaping-bar" class="progress-bar-fill"></div>
+            </div>
+        </div>
+
+        <p id="reminder-label"></p>
+
+        <div class="row-counter">
+            <button onclick="changeRow(1)">➕ Row</button>
+            <span id="row-display">Rows: 0</span>
+            <button onclick="changeRow(-1)">➖ Row</button>
+            <button onclick="resetRows()">🔄</button>
+        </div>
+
+        <div class="nav-buttons">
+            <button id="prev-btn" onclick="prevStep()">⬅ Previous</button>
+            <button id="next-btn" onclick="nextStep()">Next ➡</button>
+        </div>
+
+        <button class="reset-all" onclick="resetAll()">Reset All Progress</button>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
