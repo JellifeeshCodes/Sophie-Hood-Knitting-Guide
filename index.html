@@ -3,40 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sophie Hood Knitting Guide</title>
+    <title>🧶 Sophie Hood Guide</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="app-container">
-        <div id="text-box" class="card">
-            <p id="step-text">Loading...</p>
+        <div class="card">
+            <div id="text-box"></div>
         </div>
-        
+
         <p id="progress-label"></p>
 
-        <div id="shaping-frame" class="hidden">
+        <div id="shaping-container" class="hidden">
             <p id="shaping-label"></p>
-            <div class="progress-bar-bg">
-                <div id="shaping-bar" class="progress-bar-fill"></div>
+            <div class="progress-bg">
+                <div id="shaping-bar"></div>
             </div>
         </div>
 
-        <p id="reminder-label"></p>
+        <div id="reminder-label"></div>
 
-        <div class="row-counter">
+        <div class="row-controls">
             <button onclick="changeRow(1)">➕ Row</button>
-            <span id="row-display">Rows: 0</span>
+            <span id="row-count">Rows: 0</span>
             <button onclick="changeRow(-1)">➖ Row</button>
             <button onclick="resetRows()">🔄</button>
         </div>
 
-        <div class="nav-buttons">
+        <div class="nav-controls">
             <button id="prev-btn" onclick="prevStep()">⬅ Previous</button>
             <button id="next-btn" onclick="nextStep()">Next ➡</button>
         </div>
 
-        <button class="reset-all" onclick="resetAll()">Reset All Progress</button>
+        <button class="reset-link" onclick="resetAll()">Reset All Progress</button>
     </div>
+
+    <canvas id="confetti-canvas"></canvas>
+
     <script src="script.js"></script>
 </body>
 </html>
