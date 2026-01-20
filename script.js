@@ -40,32 +40,43 @@ function saveState() {
 }
 
 function updateDisplay() {
+    const textBox = document.getElementById('text-box');
+    const rowCount = document.getElementById('row-count');
+    const progressLabel = document.getElementById('progress-label');
+    
+    if (!textBox) return; // Guard clause if HTML hasn't loaded
+
     const stepText = steps[state.step];
     
     // Highlight links and keywords
     let formattedText = stepText.replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
     formattedText = formattedText.replace(/(increase|Increase)/g, '<span style="color:#C2185B; font-weight:bold;">$1</span>');
-    formattedText = formattedText.replace(/(decrease|Decrease|k2tog|psso)/g, '<span style="color:#1E88E5; font-weight:bold;">$1</span>');
+    formattedText = formattedText.replace(/(decrease|Decrease|knit 2 together|k2tog|psso|pass transferred|pass the transferred)/g, '<span style="color:#1E88E5; font-weight:bold;">$1</span>');
     
-    document.getElementById('text-box').innerHTML = formattedText;
-    document.getElementById('progress-label').innerText = `Step ${state.step + 1} of ${steps.length}`;
-    document.getElementById('row-count').innerText = `Rows: ${state.rows}`;
+    textBox.innerHTML = formattedText;
+    if (progressLabel) progressLabel.innerText = `Step ${state.step + 1} of ${steps.length}`;
+    if (rowCount) rowCount.innerText = `Rows: ${state.rows}`;
 
     // Shaping Progress Bar
     const section = SHAPING_SECTIONS[state.step];
     const container = document.getElementById('shaping-container');
-    if (section) {
+    const bar = document.getElementById('shaping-bar');
+    const label = document.getElementById('shaping-label');
+
+    if (section && container && bar) {
         container.classList.remove('hidden');
-        document.getElementById('shaping-label').innerText = section.label;
+        if (label) label.innerText = section.label;
         const percent = Math.min((state.rows / section.total) * 100, 100);
-        document.getElementById('shaping-bar').style.width = percent + '%';
-    } else {
+        bar.style.width = percent + '%';
+    } else if (container) {
         container.classList.add('hidden');
     }
 
     // Navigation buttons
-    document.getElementById('prev-btn').disabled = state.step === 0;
-    document.getElementById('next-btn').disabled = state.step === steps.length - 1;
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    if (prevBtn) prevBtn.disabled = state.step === 0;
+    if (nextBtn) nextBtn.disabled = state.step === steps.length - 1;
 
     shapingPing();
     saveState();
@@ -73,53 +84,93 @@ function updateDisplay() {
 
 function shapingPing() {
     const r = document.getElementById('reminder-label');
+    if (!r) return;
+
     r.innerText = "";
     const row = state.rows;
     const step = state.step;
+    
+    const colors = {
+        inc: "#C2185B",
+        dec: "#1565C0",
+        trans: "#4A148C",
+        knit: "#2E7D32"
+    };
 
-    if (step === 3 && row >= 12 && (row - 12) % 6 === 0) {
-        r.innerText = `💖 ROW ${row}: INCREASE ROW!`;
-        r.style.color = "#C2185B";
-    } else if (step === 5 && row >= 21 && row <= 32) {
-        const cycle = (row - 21) % 4;
-        if (cycle === 0) r.innerText = `⚠️ ROW ${row}: DECREASE (k2tog)`;
-        else if (cycle === 1 || cycle === 3) r.innerText = `🧶 ROW ${row}: TRANSFER 3`;
-        else r.innerText = `🧶 ROW ${row}: KNIT TO END`;
-        r.style.color = "#1565C0";
+    if (step === 3) {
+        if (row >= 12 && (row - 12) % 6 === 0) {
+            r.innerText = `💖 ROW ${row}: INCREASE ROW!`;
+            r.style.color = colors.inc;
+        }
+    } else if (step === 5 || step === 6) {
+        const startRow = (step === 5) ? 21 : 33;
+        const endRow = (step === 5) ? 32 : 44;
+        if (row >= startRow && row <= endRow) {
+            const cycle = (row - startRow) % 4;
+            if (cycle === 0) { r.innerText = `⚠️ ROW ${row}: DECREASE (k2tog)`; r.style.color = colors.dec; }
+            else if (cycle === 1 || cycle === 3) { r.innerText = `🧶 ROW ${row}: TRANSFER 3`; r.style.color = colors.trans; }
+            else { r.innerText = `🧶 ROW ${row}: KNIT TO END`; r.style.color = colors.knit; }
+        }
+    } else if (step === 7) {
+        if (row >= 45 && row <= 54) {
+            if ((row - 45) % 2 === 0) { r.innerText = `⚠️ ROW ${row}: DECREASE (k2tog)`; r.style.color = colors.dec; }
+            else { r.innerText = `🧶 ROW ${row}: TRANSFER 3`; r.style.color = colors.trans; }
+        }
+    } else if (step === 8) {
+        if (row >= 55 && row <= 64) {
+            if ((row - 55) % 2 === 0) r.innerText = `💖 ROW ${row}: INCREASE (End of Row)`;
+            else r.innerText = `💖 ROW ${row}: INCREASE & TRANSFER (Start)`;
+            r.style.color = colors.inc;
+        }
+    } else if (step === 9 || step === 10) {
+        const startRow = (step === 9) ? 65 : 77;
+        const endRow = (step === 9) ? 76 : 110;
+        if (row >= startRow && row <= endRow) {
+            if ((row - startRow) % 2 === 0) { r.innerText = `💖 ROW ${row}: INCREASE (last 2, inc, k1)`; r.style.color = colors.inc; }
+            else { r.innerText = `🧶 ROW ${row}: Knit to last 3, then TRANSFER`; r.style.color = colors.trans; }
+        }
+    } else if (step === 11) {
+        if (row === 1) { r.innerText = "🧶 ROW 1: PICK UP 3 stitches"; r.style.color = colors.inc; }
+        else if (row > 1) { r.innerText = `🧶 ROW ${row}: Knit to last 3, then TRANSFER 3`; r.style.color = colors.trans; }
+    } else if (step === 12) {
+        if (row >= 1 && row <= 246) {
+            if ((row - 1) % 6 === 0) { r.innerText = `⚠️ ROW ${row}: DECREASE (k2, sl1, k1, psso)`; r.style.color = colors.dec; }
+            else { r.innerText = `🧶 ROW ${row}: Knit to last 3, then TRANSFER 3`; r.style.color = colors.trans; }
+        }
     }
-    // (You can add the rest of the logic for steps 6-12 here following the same pattern)
 }
 
-function changeRow(val) {
+// Global functions for buttons
+window.changeRow = function(val) {
     state.rows = Math.max(0, state.rows + val);
     updateDisplay();
-}
+};
 
-function resetRows() {
+window.resetRows = function() {
     state.rows = 0;
     updateDisplay();
-}
+};
 
-function nextStep() {
+window.nextStep = function() {
     if (state.step < steps.length - 1) {
         state.step++;
         updateDisplay();
     }
-}
+};
 
-function prevStep() {
+window.prevStep = function() {
     if (state.step > 0) {
         state.step--;
         updateDisplay();
     }
-}
+};
 
-function resetAll() {
+window.resetAll = function() {
     if (confirm("Reset all progress?")) {
         state = { step: 0, rows: 0 };
         updateDisplay();
     }
-}
+};
 
-// Initial Run
-updateDisplay();
+// Ensure scripts run after DOM is ready
+document.addEventListener('DOMContentLoaded', updateDisplay);
