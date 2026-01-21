@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sophie Hood Progress Tracker</title>
+    <title>Knitting Progress Tracker</title>
     <style>
         :root {
             --pastel-pink-bg: #FCE4EC;
@@ -36,9 +36,36 @@
             text-align: center;
         }
 
-        .size-selector {
-            margin-bottom: 15px;
+        /* Menu Styles */
+        .menu-screen { display: block; }
+        .tracker-screen { display: none; }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
         }
+
+        .menu-btn {
+            background: var(--soft-pink-card);
+            border: 2px solid var(--hot-pink-accent);
+            padding: 20px 10px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            color: var(--deep-pink-text);
+            transition: all 0.2s;
+            font-size: 1rem;
+        }
+
+        .menu-btn:hover {
+            background: var(--hot-pink-accent);
+            color: white;
+        }
+
+        /* Tracker Styles */
+        .size-selector { margin-bottom: 15px; }
 
         .card {
             background-color: var(--soft-pink-card);
@@ -96,7 +123,6 @@
         }
 
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-
         .btn-row { background-color: #F8BBD0; color: var(--deep-pink-text); font-size: 1.2rem; }
         .btn-nav { background-color: var(--nav-blue-pastel); color: white; flex: 1; }
         .btn-prev { background-color: #e0e0e0; color: #666; }
@@ -127,93 +153,161 @@
 <canvas id="confetti"></canvas>
 
 <div class="container">
-    <h2>PetiteKnit Sophie Hood Guide</h2>
-
-    <div class="size-selector">
-        <label>Size: </label>
-        <input type="radio" name="size" value="0" checked onchange="updateSize(0)"> S
-        <input type="radio" name="size" value="1" onchange="updateSize(1)"> M
-        <input type="radio" name="size" value="2" onchange="updateSize(2)"> L
+    <div id="menu-screen" class="menu-screen">
+        <h1 style="color: var(--hot-pink-accent);">Knitting Tracker</h1>
+        <p>Select a project to begin:</p>
+        <div class="menu-grid">
+            <button class="menu-btn" onclick="startProject('hood')">Sophie Hood</button>
+            <button class="menu-btn" onclick="startProject('scarf')">Sophie Scarf</button>
+            <button class="menu-btn" onclick="startProject('beanie')">Classic Beanie</button>
+            <button class="menu-btn" onclick="startProject('balaclava')">Balaclava</button>
+        </div>
     </div>
 
-    <div class="card" id="step-text"></div>
-    <div class="progress-subtext" id="step-count"></div>
+    <div id="tracker-screen" class="tracker-screen">
+        <h2 id="project-title">Project Guide</h2>
 
-    <div id="shaping-area" class="shaping-section">
-        <div id="shaping-label"></div>
-        <progress id="shaping-bar" value="0" max="100"></progress>
-    </div>
+        <div class="size-selector">
+            <label>Size: </label>
+            <input type="radio" name="size" value="0" checked onchange="updateSize(0)"> S
+            <input type="radio" name="size" value="1" onchange="updateSize(1)"> M
+            <input type="radio" name="size" value="2" onchange="updateSize(2)"> L
+        </div>
 
-    <div class="reminder" id="reminder-text"></div>
+        <div class="card" id="step-text"></div>
+        <div class="progress-subtext" id="step-count"></div>
 
-    <div class="row-controls">
-        <button class="btn btn-row" onclick="changeRow(1)">+ Row</button>
-        <div style="font-size: 1.5rem; font-weight: bold;" id="row-display">Rows: 0</div>
-        <button class="btn btn-row" onclick="changeRow(-1)">- Row</button>
-        <button class="btn btn-reset" onclick="resetCounter()">🔄</button>
-    </div>
+        <div id="shaping-area" class="shaping-section">
+            <div id="shaping-label"></div>
+            <progress id="shaping-bar" value="0" max="100"></progress>
+        </div>
 
-    <div class="nav-group">
-        <button class="btn btn-nav btn-prev" id="prev-btn" onclick="prevStep()">⬅ Previous</button>
-        <button class="btn btn-nav" id="next-btn" onclick="nextStep()">Next ➡</button>
-    </div>
-    
-    <button class="btn btn-reset" style="margin-top:15px; width:100%" onclick="globalReset()">Reset Entire Project</button>
+        <div class="reminder" id="reminder-text"></div>
 
-    <div class="abbr-box">
+        <div class="row-controls">
+            <button class="btn btn-row" onclick="changeRow(1)">+ Row</button>
+            <div style="font-size: 1.5rem; font-weight: bold;" id="row-display">Rows: 0</div>
+            <button class="btn btn-row" onclick="changeRow(-1)">- Row</button>
+            <button class="btn btn-reset" onclick="resetCounter()">🔄</button>
+        </div>
+
+        <div class="nav-group">
+            <button class="btn btn-nav btn-prev" id="prev-btn" onclick="prevStep()">⬅ Previous</button>
+            <button class="btn btn-nav" id="next-btn" onclick="nextStep()">Next ➡</button>
+        </div>
+        
+        <button class="btn btn-reset" style="margin-top:15px; width:100%" onclick="goToMenu()">Exit to Menu</button>
+
+        <div class="abbr-box" id="abbr-content">
 <strong>ABBREVIATIONS</strong>
-k: knit
-k2tog: knit 2 together
-kfb: knit front and back
-p: purl
-RS: right side
-WS: wrong side
-skp: slip 1, k1, pass slipped st over
-wyif: with yarn in front
+k: knit | p: purl | RS: right side | WS: wrong side
+        </div>
     </div>
 </div>
 
 <script>
-    const steps = [
-        "Welcome to the Sophie Hood Guide 🧶\n\nSizes: S, M, L\nGauge: 17 sts = 10cm\nNeedles: 5mm\n\nChoose your size at the top and click Next to start.",
-        "Cast On\n\nCast on 6 stitches.\n\nWork Row 1 & 2 (Knit to last 3, slip 3 purl-wise wyif) a total of 3 times (6 rows total).",
-        "Scarf Section (Increases)\n\nWork increases on every 6th (8th) 10th row:\n\nRow 1 (WS): K2, kfb, knit to last 3, slip 3 wyif.\nRows 2-6: Work even.\n\nRepeat until you have 45 stitches (approx 25cm wide).",
-        "Right Hood Body\n\nRow 1 (WS): Place first 3 sts on holder, knit to last 3, slip 3 wyif. (42 sts remain)\nRow 2 (RS): Knit across.\nRow 3 (WS): Knit to last 3, slip 3 wyif.\n\nRepeat Rows 2 & 3 until you count 16 garter ridges from the holder.",
-        "Hood Shaping: 4-Row Decreases\n\nRow 1 (RS): Knit to last 3, k2tog, k1.\nRow 2 (WS): Knit to last 3, slip 3 wyif.\nRow 3 (RS): Knit across.\nRow 4 (WS): Work as Row 2.\n\nRepeat 3 times total (39 sts remaining).",
-        "Hood Shaping: 2-Row Decreases\n\nRow 1 (RS): Knit to last 3, k2tog, k1.\nRow 2 (WS): Knit to last 3, slip 3 wyif.\n\nRepeat 6 times total (33 sts remaining).",
-        "Hood Shaping: Every Row Decreases\n\nRow 1 (RS): Knit to last 3, k2tog, k1.\nRow 2 (WS): K1, k2tog, knit to last 3, slip 3 wyif.\n\nRepeat 5 times total (23 sts remaining). Point reached!",
-        "Hood Shaping: Every Row Increases\n\nRow 1 (RS): Knit to last 2, kfb, k1.\nRow 2 (WS): K1, kfb, knit to last 3, slip 3 wyif.\n\nRepeat 5 times total (33 sts total).",
-        "Hood Shaping: 2-Row Increases\n\nRow 1 (RS): Knit to last 2, kfb, k1.\nRow 2 (WS): Knit to last 3, slip 3 wyif.\n\nRepeat 6 times total (39 sts total).",
-        "Hood Shaping: 4-Row Increases\n\nRow 1 (RS): Knit across.\nRow 2 (WS): Knit to last 3, slip 3 wyif.\nRow 3 (RS): Knit to last 2, kfb, k1.\nRow 4 (WS): Work as Row 2.\n\nRepeat 3 times total (42 sts total).",
-        "Left Hood Body\n\nRow 1 (RS): Knit across.\nRow 2 (WS): Knit to last 3, slip 3 wyif.\n\nRepeat 17 times total.",
-        "Rejoin Scarf\n\nRow 1 (RS): Knit to end, hold yarn in front, pick up the 3 resting sts from holder. (45 sts total)\nRow 2 (WS): Knit to last 3, slip 3 wyif.\nRow 3 (RS): Work as Row 2.\n\nRepeat Rows 2 & 3 as per pattern size (6, 8, or 10 rows total).",
-        "Second Scarf Tail (Decreases)\n\nWork decreases on every 6th (8th) 10th row:\n\nRow 1 (WS): K3, skp, knit to last 3, slip 3 wyif.\nRows 2-6: Work even.\n\nRepeat until 7 sts remain.",
-        "Final Taper & Bind Off\n\nWork final 6 rows as per pattern, decreasing on Row 1.\n\nBind off 3 knit-wise, bind off 3 purl-wise.",
-        "Finishing\n\nSew the back of the hood using mattress stitch.\n\nGuide: <a href='https://www.youtube.com/watch?v=8bVaQep2MWw' target='_blank'>Watch Video</a>",
-        "Finished 🎉\n\nYour Sophie Hood is complete!"
-    ];
-
-    const shapingSections = {
-        2: { label: "Scarf Increases", total: 250 },
-        3: { label: "Right Hood Ridges", total: 32 },
-        4: { label: "4-Row Decreases", total: 12 },
-        5: { label: "2-Row Decreases", total: 12 },
-        6: { label: "Every Row Decreases", total: 10 },
-        7: { label: "Every Row Increases", total: 10 },
-        8: { label: "2-Row Increases", total: 12 },
-        9: { label: "4-Row Increases", total: 12 },
-        10: { label: "Left Hood Body", total: 34 },
-        11: { label: "Rejoin Rows", total: 10 }, // Added bar for Step 12
-        12: { label: "Tail Decreases", total: 250 }
+    // Pattern Data logic
+    const patterns = {
+        hood: {
+            title: "Sophie Hood Guide",
+            steps: [
+                "Welcome to the Sophie Hood 🧶\n\nSize S (M) L\nGauge: 17 sts = 10cm",
+                "Cast on 6 stitches.\nWork i-cord edge for 6 rows.",
+                "Scarf Section (Increases)\nWork increases every 6th (8th) 10th row until 45 sts.",
+                "Right Hood Body\nWork back and forth for 16 garter ridges.",
+                "Hood Shaping: Decreases\nDecrease every 4th, 2nd, and then every row.",
+                "Hood Shaping: Increases\nIncrease every row, then 2nd, then 4th row.",
+                "Left Hood Body\nWork 17 garter ridges back and forth.",
+                "Rejoin Scarf & Bind Off\nComplete the second tail and bind off.",
+                "Finished 🎉"
+            ],
+            shaping: {
+                2: { label: "Scarf Increases", total: 200 },
+                3: { label: "Right Hood Ridges", total: 32 },
+                7: { label: "Tail Decreases", total: 200 }
+            }
+        },
+        scarf: {
+            title: "Sophie Scarf Guide",
+            steps: [
+                "Welcome to the Sophie Scarf 🧣\n\nWork from tip to tip.",
+                "Cast on 6 stitches.",
+                "Increasing Section\nIncrease every 8th row until desired width.",
+                "Middle Section\nWork straight until length is almost finished.",
+                "Decreasing Section\nDecrease every 8th row until 6 sts remain.",
+                "Bind off and weave in ends.",
+                "Finished 🎉"
+            ],
+            shaping: {
+                2: { label: "Increasing", total: 100 },
+                4: { label: "Decreasing", total: 100 }
+            }
+        },
+        beanie: {
+            title: "Classic Beanie Guide",
+            steps: [
+                "Cast on for Beanie 🧢\n(S: 80, M: 88, L: 96 sts)",
+                "Work 1x1 Ribbing (K1, P1) for 5-8 cm.",
+                "Work in Stockinette Stitch (Knit all rounds) until total length is 18-22 cm.",
+                "Decrease Rounds\nK2tog across every other row until 8 sts remain.",
+                "Cut yarn and pull through remaining stitches.",
+                "Finished 🎉"
+            ],
+            shaping: {
+                2: { label: "Body Length", total: 60 },
+                3: { label: "Crown Decreases", total: 10 }
+            }
+        },
+        balaclava: {
+            title: "Balaclava Guide",
+            steps: [
+                "Cast on for Balaclava 🥷\nStarting from the top down.",
+                "Work top rectangle shaping.",
+                "Pick up stitches and work the hood section.",
+                "Face Opening\nCast off stitches for face, then cast back on in next row.",
+                "Neck Section\nWork in the round (K2, P2 ribbing).",
+                "Bind off loosely.",
+                "Finished 🎉"
+            ],
+            shaping: {
+                2: { label: "Hood Length", total: 50 },
+                4: { label: "Neck Ribbing", total: 30 }
+            }
+        }
     };
 
-    let state = JSON.parse(localStorage.getItem('sophieState')) || { step: 0, rows: 0, size: 0 };
+    let currentPattern = null;
+    let state = JSON.parse(localStorage.getItem('knittingState')) || { project: null, step: 0, rows: 0, size: 0 };
 
-    function save() {
-        localStorage.setItem('sophieState', JSON.stringify(state));
+    function startProject(type) {
+        state.project = type;
+        state.step = 0;
+        state.rows = 0;
+        loadProject();
+    }
+
+    function loadProject() {
+        if (!state.project) return;
+        currentPattern = patterns[state.project];
+        
+        document.getElementById('menu-screen').style.display = 'none';
+        document.getElementById('tracker-screen').style.display = 'block';
+        document.getElementById('project-title').innerText = currentPattern.title;
+        
+        updateDisplay();
+    }
+
+    function goToMenu() {
+        if(confirm("Exit to menu? Progress is saved.")) {
+            document.getElementById('menu-screen').style.display = 'block';
+            document.getElementById('tracker-screen').style.display = 'none';
+        }
     }
 
     function updateDisplay() {
+        if (!currentPattern) return;
+        
+        const steps = currentPattern.steps;
         document.getElementById('step-text').innerHTML = steps[state.step].replace(/\n/g, "<br>");
         document.getElementById('step-count').innerText = `Step ${state.step + 1} of ${steps.length}`;
         document.getElementById('row-display').innerText = `Rows: ${state.rows}`;
@@ -221,128 +315,19 @@ wyif: with yarn in front
         document.getElementById('prev-btn').disabled = state.step === 0;
         document.getElementById('next-btn').disabled = state.step === steps.length - 1;
 
-        const shaping = shapingSections[state.step];
+        const shaping = currentPattern.shaping[state.step];
         const area = document.getElementById('shaping-area');
         if (shaping) {
             area.style.display = 'block';
             document.getElementById('shaping-label').innerText = shaping.label;
-            
-            // Adjust max for step 12 based on size
-            let maxVal = shaping.total;
-            if (state.step === 11) {
-                const rates = [6, 8, 10];
-                maxVal = rates[state.size];
-            }
-            
-            document.getElementById('shaping-bar').max = maxVal;
+            document.getElementById('shaping-bar').max = shaping.total;
             document.getElementById('shaping-bar').value = state.rows;
         } else {
             area.style.display = 'none';
         }
 
-        updateShapingPing();
-        save();
+        localStorage.setItem('knittingState', JSON.stringify(state));
         if(state.step === steps.length - 1) triggerConfetti();
-    }
-
-    function updateShapingPing() {
-        const reminder = document.getElementById('reminder-text');
-        reminder.innerText = "";
-        const row = state.rows;
-        const step = state.step;
-        const rates = [6, 8, 10];
-        const rate = rates[state.size];
-
-        if (row === 0) return;
-
-        const incCol = "var(--inc-color)";
-        const decCol = "var(--dec-color)";
-        const neutCol = "var(--neut-color)";
-
-        if (step === 2) { // Scarf Increases
-            if ((row - 1) % rate === 0) {
-                reminder.innerText = `💖 ROW ${row} (WS): INCREASE\nK2, kfb, knit to last 3, slip 3`;
-                reminder.style.color = incCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row}: Work Even (Row ${((row - 1) % rate) + 1} of ${rate})`;
-                reminder.style.color = neutCol;
-            }
-        } 
-        else if (step === 3) { // Right Hood Body
-            if (row === 1) {
-                reminder.innerText = `📌 ROW 1 (WS): SETUP\nPlace 3 sts on holder, knit to last 3, slip 3`;
-                reminder.style.color = "var(--hot-pink-accent)";
-            } else if (row % 2 === 0) {
-                reminder.innerText = `🧶 ROW ${row} (RS): Row 2\nKnit across`;
-                reminder.style.color = neutCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row} (WS): Row 3\nKnit to last 3, slip 3 wyif`;
-                reminder.style.color = neutCol;
-            }
-        }
-        else if (step === 4) { // 4-Row Decreases
-            let cycle = (row - 1) % 4;
-            if (cycle === 0) { reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE\nKnit to last 3, k2tog, k1`; reminder.style.color = decCol; }
-            else if (cycle === 2) { reminder.innerText = `🧶 ROW ${row} (RS): Knit across`; reminder.style.color = neutCol; }
-            else { reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; reminder.style.color = neutCol; }
-        }
-        else if (step === 5) { // 2-Row Decreases
-            if ((row - 1) % 2 === 0) { 
-                reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE\nKnit to last 3, k2tog, k1`; 
-                reminder.style.color = decCol; 
-            } else { 
-                reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; 
-                reminder.style.color = neutCol; 
-            }
-        }
-        else if (step === 6) { // Every Row Decreases
-            reminder.innerText = (row % 2 !== 0) ? `⚠️ ROW ${row} (RS): k to last 3, k2tog, k1` : `⚠️ ROW ${row} (WS): k1, k2tog, k to last 3, slip 3`;
-            reminder.style.color = decCol;
-        }
-        else if (step === 7) { // Every Row Increases
-            reminder.innerText = (row % 2 !== 0) ? `💖 ROW ${row} (RS): k to last 2, kfb, k1` : `💖 ROW ${row} (WS): k1, kfb, k to last 3, slip 3`;
-            reminder.style.color = incCol;
-        }
-        else if (step === 8) { // 2-Row Increases
-            if ((row - 1) % 2 === 0) {
-                reminder.innerText = `💖 ROW ${row} (RS): INCREASE\nKnit to last 2, kfb, k1`;
-                reminder.style.color = incCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`;
-                reminder.style.color = neutCol;
-            }
-        }
-        else if (step === 9) { // 4-Row Increases
-            let cycle = (row - 1) % 4;
-            if (cycle === 0) { reminder.innerText = `🧶 ROW ${row} (RS): Knit across`; reminder.style.color = neutCol; }
-            else if (cycle === 2) { reminder.innerText = `💖 ROW ${row} (RS): INCREASE\nKnit to last 2, kfb, k1`; reminder.style.color = incCol; }
-            else { reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; reminder.style.color = neutCol; }
-        }
-        else if (step === 10) { // Left Hood Body
-            reminder.innerText = (row % 2 !== 0) ? `🧶 ROW ${row} (RS): Knit across` : `🧶 ROW ${row} (WS): Knit to last 3, slip 3`;
-            reminder.style.color = neutCol;
-        }
-        else if (step === 11) { // Rejoin Scarf (Index for Step 12)
-            if (row === 1) {
-                reminder.innerText = `🔗 ROW 1 (RS): REJOIN\nKnit to end, pick up 3 sts from holder`;
-                reminder.style.color = "var(--hot-pink-accent)";
-            } else if (row % 2 === 0) {
-                reminder.innerText = `🧶 ROW ${row} (WS): Row 2\nKnit to last 3, slip 3 wyif`;
-                reminder.style.color = neutCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row} (RS): Row 3\nWork as Row 2 (Knit to last 3, slip 3)`;
-                reminder.style.color = neutCol;
-            }
-        }
-        else if (step === 12) { // Tail Decreases
-            if ((row - 1) % rate === 0) {
-                reminder.innerText = `⚠️ ROW ${row} (WS): DECREASE\nK3, skp, knit to last 3, slip 3 wyif`;
-                reminder.style.color = decCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row}: Work Even (Row ${((row - 1) % rate) + 1} of ${rate})`;
-                reminder.style.color = neutCol;
-            }
-        }
     }
 
     function changeRow(val) {
@@ -354,13 +339,6 @@ wyif: with yarn in front
     function prevStep() { state.step--; state.rows = 0; updateDisplay(); }
     function resetCounter() { state.rows = 0; updateDisplay(); }
     function updateSize(s) { state.size = s; updateDisplay(); }
-    
-    function globalReset() {
-        if(confirm("Reset all progress?")) {
-            state = { step: 0, rows: 0, size: 0 };
-            updateDisplay();
-        }
-    }
 
     function triggerConfetti() {
         const canvas = document.getElementById('confetti');
@@ -368,13 +346,13 @@ wyif: with yarn in front
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         let particles = [];
-        for(let i=0; i<50; i++) {
+        for(let i=0; i<30; i++) {
             particles.push({
                 x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height - canvas.height,
-                size: Math.random() * 10 + 5,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 8 + 4,
                 speed: Math.random() * 3 + 2,
-                color: ['#F06292', '#F8BBD0', '#FF80AB'][Math.floor(Math.random()*3)]
+                color: ['#F06292', '#90CAF9', '#FF80AB'][Math.floor(Math.random()*3)]
             });
         }
         function draw() {
@@ -391,7 +369,8 @@ wyif: with yarn in front
         draw();
     }
 
-    updateDisplay();
+    // Auto-load if project exists
+    if (state.project) loadProject();
 </script>
 
 </body>
