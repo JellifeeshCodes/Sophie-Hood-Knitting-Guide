@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Knitting Progress Tracker</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --pastel-pink-bg: #FCE4EC;
@@ -17,7 +18,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* Applied handwritten font */
+            font-family: 'Kalam', cursive;
             background-color: var(--pastel-pink-bg);
             color: var(--deep-pink-text);
             display: flex;
@@ -38,6 +40,10 @@
             z-index: 10;
         }
 
+        h1, h2 {
+            font-weight: 700;
+        }
+
         /* Menu Display */
         #menu-screen { display: block; }
         #tracker-screen { display: none; }
@@ -50,12 +56,14 @@
         }
 
         .menu-btn {
+            font-family: 'Kalam', cursive;
             background: var(--soft-pink-card);
             border: 2px solid var(--hot-pink-accent);
             padding: 25px 10px;
             border-radius: 15px;
             cursor: pointer;
             font-weight: bold;
+            font-size: 1.1rem;
             color: var(--deep-pink-text);
             transition: all 0.2s;
         }
@@ -69,21 +77,22 @@
         .size-selector { margin-bottom: 15px; }
 
         .card {
-            background-color: var(--soft-pink-card);
+            background-color: #fff9c4; /* Pale yellow sticky-note color */
             padding: 20px;
-            border-radius: 15px;
+            border-radius: 5px;
             min-height: 150px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             margin-bottom: 10px;
-            line-height: 1.5;
+            line-height: 1.4;
+            box-shadow: 2px 5px 10px rgba(0,0,0,0.05);
+            border-left: 5px solid #fbc02d;
         }
 
         .progress-subtext {
-            font-style: italic;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             margin-bottom: 20px;
         }
 
@@ -100,7 +109,7 @@
 
         .reminder {
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1.3rem;
             min-height: 60px;
             margin: 15px 0;
             white-space: pre-wrap;
@@ -115,6 +124,7 @@
         }
 
         .btn {
+            font-family: 'Kalam', cursive;
             border: none;
             padding: 10px 20px;
             border-radius: 8px;
@@ -124,19 +134,20 @@
         }
 
         .btn:disabled { opacity: 0.3; cursor: not-allowed; }
-        .btn-row { background-color: #F8BBD0; color: var(--deep-pink-text); font-size: 1.2rem; }
-        .btn-nav { background-color: var(--nav-blue-pastel); color: white; flex: 1; }
+        .btn-row { background-color: #F8BBD0; color: var(--deep-pink-text); font-size: 1.3rem; }
+        .btn-nav { background-color: var(--nav-blue-pastel); color: white; flex: 1; font-size: 1.1rem; }
         .btn-prev { background-color: #e0e0e0; color: #666; }
-        .btn-reset { background-color: #FFCDD2; color: var(--deep-pink-text); font-size: 0.8rem; }
+        .btn-reset { background-color: #FFCDD2; color: var(--deep-pink-text); font-size: 1rem; }
 
         .nav-group { display: flex; gap: 10px; margin-top: 10px; }
 
         .abbr-box {
             text-align: left;
-            font-size: 0.85rem;
-            background: #f9f9f9;
+            font-size: 0.9rem;
+            background: #fdfdfd;
             padding: 15px;
             border-radius: 10px;
+            border: 1px dashed #ccc;
             margin-top: 20px;
             white-space: pre-wrap;
         }
@@ -241,9 +252,9 @@
                 12: { label: "Tail Decreases", total: 250 }
             }
         },
-        scarf: { title: "Sophie Scarf Guide", abbr: "k, p, kfb", abbr: "<strong>ABBREVIATIONS</strong>\nk: knit\nk2tog: knit 2 together\nkfb: knit front and back\np: purl\nRS: right side\nWS: wrong side\nskp: slip 1, k1, pass slipped st over\nwyif: with yarn in front", steps: ["Start...", "Middle...", "End..."], shaping: {} },
-        beanie: { title: "Beanie Guide", abbr: "k, p, k2tog", abbr: "<strong>ABBREVIATIONS</strong>\nk: knit\nk2tog: knit 2 together\nkfb: knit front and back\np: purl\nRS: right side\nWS: wrong side\nskp: slip 1, k1, pass slipped st over\nwyif: with yarn in front", steps: ["Cast on...", "Rib...", "Crown..."], shaping: {} },
-        balaclava: { title: "Balaclava Guide", abbr: "k, p", abbr: "<strong>ABBREVIATIONS</strong>\nk: knit\nk2tog: knit 2 together\nkfb: knit front and back\np: purl\nRS: right side\nWS: wrong side\nskp: slip 1, k1, pass slipped st over\nwyif: with yarn in front", steps: ["Neck...", "Face...", "Top..."], shaping: {} }
+        scarf: { title: "Sophie Scarf Guide", abbr: "<strong>ABBREVIATIONS</strong>\nk: knit\nk2tog: knit 2 together\nkfb: knit front and back\np: purl\nRS: right side\nWS: wrong side\nskp: slip 1, k1, pass slipped st over\nwyif: with yarn in front", steps: ["Start...", "Middle...", "End..."], shaping: {} },
+        beanie: { title: "Beanie Guide", abbr: "<strong>ABBREVIATIONS</strong>\nk: knit\nk2tog: knit 2 together\nkfb: knit front and back\np: purl\nRS: right side\nWS: wrong side\nskp: slip 1, k1, pass slipped st over\nwyif: with yarn in front", steps: ["Cast on...", "Rib...", "Crown..."], shaping: {} },
+        balaclava: { title: "Balaclava Guide", abbr: "<strong>ABBREVIATIONS</strong>\nk: knit\nk2tog: knit 2 together\nkfb: knit front and back\np: purl\nRS: right side\nWS: wrong side\nskp: slip 1, k1, pass slipped st over\nwyif: with yarn in front", steps: ["Neck...", "Face...", "Top..."], shaping: {} }
     };
 
     let state = JSON.parse(localStorage.getItem('sophieState')) || { project: null, step: 0, rows: 0, size: 0 };
@@ -431,6 +442,3 @@
 
 </body>
 </html>
-
-
-
