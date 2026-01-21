@@ -195,7 +195,7 @@ wyif: with yarn in front
 
     const shapingSections = {
         2: { label: "Scarf Increases", total: 250 },
-        3: { label: "Right Hood Ridges", total: 33 },
+        3: { label: "Right Hood Ridges", total: 32 },
         4: { label: "4-Row Decreases", total: 12 },
         5: { label: "2-Row Decreases", total: 12 },
         6: { label: "Every Row Decreases", total: 10 },
@@ -217,11 +217,9 @@ wyif: with yarn in front
         document.getElementById('step-count').innerText = `Step ${state.step + 1} of ${steps.length}`;
         document.getElementById('row-display').innerText = `Rows: ${state.rows}`;
         
-        // Buttons
         document.getElementById('prev-btn').disabled = state.step === 0;
         document.getElementById('next-btn').disabled = state.step === steps.length - 1;
 
-        // Shaping
         const shaping = shapingSections[state.step];
         const area = document.getElementById('shaping-area');
         if (shaping) {
@@ -248,7 +246,6 @@ wyif: with yarn in front
 
         if (row === 0) return;
 
-        // Colors
         const incCol = "var(--inc-color)";
         const decCol = "var(--dec-color)";
         const neutCol = "var(--neut-color)";
@@ -262,6 +259,18 @@ wyif: with yarn in front
                 reminder.style.color = neutCol;
             }
         } 
+        else if (step === 3) { // Right Hood Body (Step 4)
+            if (row === 1) {
+                reminder.innerText = `📌 ROW 1 (WS): SETUP\nPlace 3 sts on holder, knit to last 3, slip 3`;
+                reminder.style.color = "var(--hot-pink-accent)";
+            } else if (row % 2 === 0) {
+                reminder.innerText = `🧶 ROW ${row} (RS): Row 2\nKnit across`;
+                reminder.style.color = neutCol;
+            } else {
+                reminder.innerText = `🧶 ROW ${row} (WS): Row 3\nKnit to last 3, slip 3 wyif`;
+                reminder.style.color = neutCol;
+            }
+        }
         else if (step === 4) { // 4-Row Decreases
             let cycle = (row - 1) % 4;
             if (cycle === 0) { reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE\nKnit to last 3, k2tog, k1`; reminder.style.color = decCol; }
@@ -278,22 +287,12 @@ wyif: with yarn in front
             }
         }
         else if (step === 6) { // Every Row Decreases
-            if (row % 2 !== 0) {
-                reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE\nKnit to last 3, k2tog, k1`;
-                reminder.style.color = decCol;
-            } else {
-                reminder.innerText = `⚠️ ROW ${row} (WS): DECREASE\nK1, k2tog, knit to last 3, slip 3 wyif`;
-                reminder.style.color = decCol;
-            }
+            reminder.innerText = (row % 2 !== 0) ? `⚠️ ROW ${row} (RS): k to last 3, k2tog, k1` : `⚠️ ROW ${row} (WS): k1, k2tog, k to last 3, slip 3`;
+            reminder.style.color = decCol;
         }
         else if (step === 7) { // Every Row Increases
-            if (row % 2 !== 0) {
-                reminder.innerText = `💖 ROW ${row} (RS): INCREASE\nKnit to last 2, kfb, k1`;
-                reminder.style.color = incCol;
-            } else {
-                reminder.innerText = `💖 ROW ${row} (WS): INCREASE\nK1, kfb, knit to last 3, slip 3 wyif`;
-                reminder.style.color = incCol;
-            }
+            reminder.innerText = (row % 2 !== 0) ? `💖 ROW ${row} (RS): k to last 2, kfb, k1` : `💖 ROW ${row} (WS): k1, kfb, k to last 3, slip 3`;
+            reminder.style.color = incCol;
         }
         else if (step === 8) { // 2-Row Increases
             if ((row - 1) % 2 === 0) {
@@ -311,18 +310,8 @@ wyif: with yarn in front
             else { reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; reminder.style.color = neutCol; }
         }
         else if (step === 10) { // Left Hood Body
-            if (row % 2 !== 0) { reminder.innerText = `🧶 ROW ${row} (RS): Knit across`; }
-            else { reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; }
+            reminder.innerText = (row % 2 !== 0) ? `🧶 ROW ${row} (RS): Knit across` : `🧶 ROW ${row} (WS): Knit to last 3, slip 3`;
             reminder.style.color = neutCol;
-        }
-        else if (step === 11) { // Rejoin Scarf
-            if (row === 1) { 
-                reminder.innerText = `🔗 ROW ${row} (RS): REJOIN\nKnit to end, pick up 3 sts from holder`; 
-                reminder.style.color = incCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row}: Knit to last 3, slip 3 wyif`;
-                reminder.style.color = neutCol;
-            }
         }
         else if (step === 12) { // Tail Decreases
             if ((row - 1) % rate === 0) {
@@ -332,14 +321,6 @@ wyif: with yarn in front
                 reminder.innerText = `🧶 ROW ${row}: Work Even (Row ${((row - 1) % rate) + 1} of ${rate})`;
                 reminder.style.color = neutCol;
             }
-        }
-        else if (step === 13) { // Final Taper
-            if (row === 1) { reminder.innerText = `⚠️ ROW ${row}: Final Decrease Row`; reminder.style.color = decCol; }
-            else { reminder.innerText = `🧶 ROW ${row}: Continue to Row 6 then Bind Off`; reminder.style.color = neutCol; }
-        }
-        else if (step === 14) { // Finishing
-            reminder.innerText = `🪡 Sew the back of the hood using Mattress Stitch.`;
-            reminder.style.color = "var(--hot-pink-accent)";
         }
     }
 
@@ -360,7 +341,6 @@ wyif: with yarn in front
         }
     }
 
-    // Simple Confetti
     function triggerConfetti() {
         const canvas = document.getElementById('confetti');
         const ctx = canvas.getContext('2d');
@@ -385,7 +365,7 @@ wyif: with yarn in front
                 ctx.fill();
                 p.y += p.speed;
             });
-            if(particles[0].y < canvas.height) requestAnimationFrame(draw);
+            if(particles.length > 0 && particles[0].y < canvas.height) requestAnimationFrame(draw);
         }
         draw();
     }
