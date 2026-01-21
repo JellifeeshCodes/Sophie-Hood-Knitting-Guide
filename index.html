@@ -203,6 +203,7 @@ wyif: with yarn in front
         8: { label: "2-Row Increases", total: 12 },
         9: { label: "4-Row Increases", total: 12 },
         10: { label: "Left Hood Body", total: 34 },
+        11: { label: "Rejoin Rows", total: 10 }, // Added bar for Step 12
         12: { label: "Tail Decreases", total: 250 }
     };
 
@@ -225,7 +226,15 @@ wyif: with yarn in front
         if (shaping) {
             area.style.display = 'block';
             document.getElementById('shaping-label').innerText = shaping.label;
-            document.getElementById('shaping-bar').max = shaping.total;
+            
+            // Adjust max for step 12 based on size
+            let maxVal = shaping.total;
+            if (state.step === 11) {
+                const rates = [6, 8, 10];
+                maxVal = rates[state.size];
+            }
+            
+            document.getElementById('shaping-bar').max = maxVal;
             document.getElementById('shaping-bar').value = state.rows;
         } else {
             area.style.display = 'none';
@@ -259,7 +268,7 @@ wyif: with yarn in front
                 reminder.style.color = neutCol;
             }
         } 
-        else if (step === 3) { // Right Hood Body (Step 4)
+        else if (step === 3) { // Right Hood Body
             if (row === 1) {
                 reminder.innerText = `📌 ROW 1 (WS): SETUP\nPlace 3 sts on holder, knit to last 3, slip 3`;
                 reminder.style.color = "var(--hot-pink-accent)";
@@ -312,6 +321,18 @@ wyif: with yarn in front
         else if (step === 10) { // Left Hood Body
             reminder.innerText = (row % 2 !== 0) ? `🧶 ROW ${row} (RS): Knit across` : `🧶 ROW ${row} (WS): Knit to last 3, slip 3`;
             reminder.style.color = neutCol;
+        }
+        else if (step === 11) { // Rejoin Scarf (Index for Step 12)
+            if (row === 1) {
+                reminder.innerText = `🔗 ROW 1 (RS): REJOIN\nKnit to end, pick up 3 sts from holder`;
+                reminder.style.color = "var(--hot-pink-accent)";
+            } else if (row % 2 === 0) {
+                reminder.innerText = `🧶 ROW ${row} (WS): Row 2\nKnit to last 3, slip 3 wyif`;
+                reminder.style.color = neutCol;
+            } else {
+                reminder.innerText = `🧶 ROW ${row} (RS): Row 3\nWork as Row 2 (Knit to last 3, slip 3)`;
+                reminder.style.color = neutCol;
+            }
         }
         else if (step === 12) { // Tail Decreases
             if ((row - 1) % rate === 0) {
