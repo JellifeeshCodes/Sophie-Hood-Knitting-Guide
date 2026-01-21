@@ -75,6 +75,7 @@
             font-size: 1.2rem;
             min-height: 60px;
             margin: 15px 0;
+            white-space: pre-wrap;
         }
 
         .row-controls {
@@ -247,21 +248,99 @@ wyif: with yarn in front
 
         if (row === 0) return;
 
-        if (step === 2) {
+        // Colors
+        const incCol = "var(--inc-color)";
+        const decCol = "var(--dec-color)";
+        const neutCol = "var(--neut-color)";
+
+        if (step === 2) { // Scarf Increases
             if ((row - 1) % rate === 0) {
                 reminder.innerText = `💖 ROW ${row} (WS): INCREASE\nK2, kfb, knit to last 3, slip 3`;
-                reminder.style.color = "var(--inc-color)";
+                reminder.style.color = incCol;
             } else {
                 reminder.innerText = `🧶 ROW ${row}: Work Even (Row ${((row - 1) % rate) + 1} of ${rate})`;
-                reminder.style.color = "var(--neut-color)";
+                reminder.style.color = neutCol;
             }
-        } else if (step === 4) {
+        } 
+        else if (step === 4) { // 4-Row Decreases
             let cycle = (row - 1) % 4;
-            if (cycle === 0) { reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE (k2tog)`; reminder.style.color = "var(--dec-color)"; }
-            else if (cycle === 2) { reminder.innerText = `🧶 ROW ${row} (RS): Knit across`; }
-            else { reminder.innerText = `🧶 ROW ${row} (WS): Slip 3 wyif`; }
+            if (cycle === 0) { reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE\nKnit to last 3, k2tog, k1`; reminder.style.color = decCol; }
+            else if (cycle === 2) { reminder.innerText = `🧶 ROW ${row} (RS): Knit across`; reminder.style.color = neutCol; }
+            else { reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; reminder.style.color = neutCol; }
         }
-        // ... (Remaining logic logic matches your Python logic)
+        else if (step === 5) { // 2-Row Decreases
+            if ((row - 1) % 2 === 0) { 
+                reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE\nKnit to last 3, k2tog, k1`; 
+                reminder.style.color = decCol; 
+            } else { 
+                reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; 
+                reminder.style.color = neutCol; 
+            }
+        }
+        else if (step === 6) { // Every Row Decreases
+            if (row % 2 !== 0) {
+                reminder.innerText = `⚠️ ROW ${row} (RS): DECREASE\nKnit to last 3, k2tog, k1`;
+                reminder.style.color = decCol;
+            } else {
+                reminder.innerText = `⚠️ ROW ${row} (WS): DECREASE\nK1, k2tog, knit to last 3, slip 3 wyif`;
+                reminder.style.color = decCol;
+            }
+        }
+        else if (step === 7) { // Every Row Increases
+            if (row % 2 !== 0) {
+                reminder.innerText = `💖 ROW ${row} (RS): INCREASE\nKnit to last 2, kfb, k1`;
+                reminder.style.color = incCol;
+            } else {
+                reminder.innerText = `💖 ROW ${row} (WS): INCREASE\nK1, kfb, knit to last 3, slip 3 wyif`;
+                reminder.style.color = incCol;
+            }
+        }
+        else if (step === 8) { // 2-Row Increases
+            if ((row - 1) % 2 === 0) {
+                reminder.innerText = `💖 ROW ${row} (RS): INCREASE\nKnit to last 2, kfb, k1`;
+                reminder.style.color = incCol;
+            } else {
+                reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`;
+                reminder.style.color = neutCol;
+            }
+        }
+        else if (step === 9) { // 4-Row Increases
+            let cycle = (row - 1) % 4;
+            if (cycle === 0) { reminder.innerText = `🧶 ROW ${row} (RS): Knit across`; reminder.style.color = neutCol; }
+            else if (cycle === 2) { reminder.innerText = `💖 ROW ${row} (RS): INCREASE\nKnit to last 2, kfb, k1`; reminder.style.color = incCol; }
+            else { reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; reminder.style.color = neutCol; }
+        }
+        else if (step === 10) { // Left Hood Body
+            if (row % 2 !== 0) { reminder.innerText = `🧶 ROW ${row} (RS): Knit across`; }
+            else { reminder.innerText = `🧶 ROW ${row} (WS): Knit to last 3, slip 3 wyif`; }
+            reminder.style.color = neutCol;
+        }
+        else if (step === 11) { // Rejoin Scarf
+            if (row === 1) { 
+                reminder.innerText = `🔗 ROW ${row} (RS): REJOIN\nKnit to end, pick up 3 sts from holder`; 
+                reminder.style.color = incCol;
+            } else {
+                reminder.innerText = `🧶 ROW ${row}: Knit to last 3, slip 3 wyif`;
+                reminder.style.color = neutCol;
+            }
+        }
+        else if (step === 12) { // Tail Decreases
+            if ((row - 1) % rate === 0) {
+                reminder.innerText = `⚠️ ROW ${row} (WS): DECREASE\nK3, skp, knit to last 3, slip 3 wyif`;
+                reminder.style.color = decCol;
+            } else {
+                reminder.innerText = `🧶 ROW ${row}: Work Even (Row ${((row - 1) % rate) + 1} of ${rate})`;
+                reminder.style.color = neutCol;
+            }
+        }
+        else if (step === 13) { // Final Taper
+            if (row === 1) { reminder.innerText = `⚠️ ROW ${row}: Final Decrease Row`; reminder.style.color = decCol; }
+            else { reminder.innerText = `🧶 ROW ${row}: Continue to Row 6 then Bind Off`; reminder.style.color = neutCol; }
+        }
+        else if (step === 14) { // Finishing
+            reminder.innerText = `🪡 Sew the back of the hood using Mattress Stitch.`;
+            reminder.style.color = "var(--hot-pink-accent)";
+        }
     }
 
     function changeRow(val) {
@@ -316,7 +395,3 @@ wyif: with yarn in front
 
 </body>
 </html>
-
-
-
-
