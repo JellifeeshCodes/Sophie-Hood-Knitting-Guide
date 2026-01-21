@@ -34,6 +34,8 @@
             padding: 20px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.05);
             text-align: center;
+            position: relative;
+            z-index: 10;
         }
 
         /* Menu Display */
@@ -143,7 +145,7 @@
             position: fixed;
             top: 0; left: 0;
             pointer-events: none;
-            z-index: 99;
+            z-index: 100;
         }
     </style>
 </head>
@@ -203,7 +205,6 @@
 </div>
 
 <script>
-    // Patterns Data
     const patterns = {
         hood: {
             title: "PetiteKnit Sophie Hood Guide",
@@ -240,27 +241,14 @@
                 12: { label: "Tail Decreases", total: 250 }
             }
         },
-        scarf: {
-            title: "Sophie Scarf Guide",
-            abbr: "<strong>ABBREVIATIONS</strong>\nk: knit | kfb: knit front & back | skp: slip 1, k1, pass over",
-            steps: ["Welcome to Scarf Mode", "Cast on 6 sts", "Work increases...", "Work Straight...", "Work Decreases...", "Finish!"],
-            shaping: { 2: { label: "Increasing", total: 100 }, 4: { label: "Decreasing", total: 100 } }
-        },
-        beanie: {
-            title: "Beanie Guide",
-            abbr: "<strong>ABBREVIATIONS</strong>\nk: knit | p: purl | k2tog: knit 2 together",
-            steps: ["Welcome to Beanie Mode", "Cast on 80 sts", "Ribbing...", "Body...", "Decreases...", "Finish!"],
-            shaping: { 2: { label: "Ribbing Rows", total: 20 }, 3: { label: "Body Rows", total: 60 } }
-        },
-        balaclava: {
-            title: "Balaclava Guide",
-            abbr: "<strong>ABBREVIATIONS</strong>\nk: knit | p: purl | RS: Right Side",
-            steps: ["Welcome to Balaclava Mode", "Cast on...", "Top Shaping...", "Face opening...", "Neck...", "Finish!"],
-            shaping: { 2: { label: "Hood Height", total: 40 }, 4: { label: "Neck Ribbing", total: 30 } }
-        }
+        scarf: { title: "Sophie Scarf Guide", abbr: "k, p, kfb", steps: ["Start...", "Middle...", "End..."], shaping: {} },
+        beanie: { title: "Beanie Guide", abbr: "k, p, k2tog", steps: ["Cast on...", "Rib...", "Crown..."], shaping: {} },
+        balaclava: { title: "Balaclava Guide", abbr: "k, p", steps: ["Neck...", "Face...", "Top..."], shaping: {} }
     };
 
     let state = JSON.parse(localStorage.getItem('sophieState')) || { project: null, step: 0, rows: 0, size: 0 };
+    let confettiActive = false;
+    let confettiAnimId = null;
 
     function startProject(type) {
         state.project = type;
@@ -271,6 +259,7 @@
 
     function exitToMenu() {
         if(confirm("Back to menu? Your progress is saved.")) {
+            stopConfetti();
             state.project = null;
             document.getElementById('menu-screen').style.display = 'block';
             document.getElementById('tracker-screen').style.display = 'none';
@@ -287,9 +276,7 @@
         updateDisplay();
     }
 
-    function save() {
-        localStorage.setItem('sophieState', JSON.stringify(state));
-    }
+    function save() { localStorage.setItem('sophieState', JSON.stringify(state)); }
 
     function updateDisplay() {
         const pattern = patterns[state.project];
@@ -323,9 +310,9 @@
 
         save();
         if(state.step === pattern.steps.length - 1) triggerConfetti();
+        else stopConfetti();
     }
 
-    // ORIGINAL SHAPING PING LOGIC (Untouched for Sophie Hood)
     function updateShapingPing() {
         const reminder = document.getElementById('reminder-text');
         reminder.innerText = "";
@@ -333,33 +320,18 @@
         const step = state.step;
         const rates = [6, 8, 10];
         const rate = rates[state.size];
-
         if (row === 0) return;
 
-        const incCol = "var(--inc-color)";
-        const decCol = "var(--dec-color)";
-        const neutCol = "var(--neut-color)";
+        const incCol = "var(--inc-color)", decCol = "var(--dec-color)", neutCol = "var(--neut-color)";
 
         if (step === 2) { 
-            if ((row - 1) % rate === 0) {
-                reminder.innerText = `💖 ROW ${row} (WS): INCREASE\nK2, kfb, knit to last 3, slip 3`;
-                reminder.style.color = incCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row}: Work Even (Row ${((row - 1) % rate) + 1} of ${rate})`;
-                reminder.style.color = neutCol;
-            }
+            if ((row - 1) % rate === 0) { reminder.innerText = `💖 ROW ${row} (WS): INCREASE\nK2, kfb, knit to last 3, slip 3`; reminder.style.color = incCol; }
+            else { reminder.innerText = `🧶 ROW ${row}: Work Even (Row ${((row - 1) % rate) + 1} of ${rate})`; reminder.style.color = neutCol; }
         } 
         else if (step === 3) {
-            if (row === 1) {
-                reminder.innerText = `📌 ROW 1 (WS): SETUP\nPlace 3 sts on holder, knit to last 3, slip 3`;
-                reminder.style.color = "var(--hot-pink-accent)";
-            } else if (row % 2 === 0) {
-                reminder.innerText = `🧶 ROW ${row} (RS): Row 2\nKnit across`;
-                reminder.style.color = neutCol;
-            } else {
-                reminder.innerText = `🧶 ROW ${row} (WS): Row 3\nKnit to last 3, slip 3 wyif`;
-                reminder.style.color = neutCol;
-            }
+            if (row === 1) { reminder.innerText = `📌 ROW 1 (WS): SETUP\nPlace 3 sts on holder, knit to last 3, slip 3`; reminder.style.color = "var(--hot-pink-accent)"; }
+            else if (row % 2 === 0) { reminder.innerText = `🧶 ROW ${row} (RS): Row 2\nKnit across`; reminder.style.color = neutCol; }
+            else { reminder.innerText = `🧶 ROW ${row} (WS): Row 3\nKnit to last 3, slip 3 wyif`; reminder.style.color = neutCol; }
         }
         else if (step === 4) {
             let cycle = (row - 1) % 4;
@@ -404,17 +376,23 @@
         }
     }
 
-    function changeRow(val) {
-        state.rows = Math.max(0, state.rows + val);
-        updateDisplay();
-    }
-
-    function nextStep() { state.step++; state.rows = 0; updateDisplay(); }
-    function prevStep() { state.step--; state.rows = 0; updateDisplay(); }
+    function changeRow(val) { state.rows = Math.max(0, state.rows + val); updateDisplay(); }
+    function nextStep() { stopConfetti(); state.step++; state.rows = 0; updateDisplay(); }
+    function prevStep() { stopConfetti(); state.step--; state.rows = 0; updateDisplay(); }
     function resetCounter() { state.rows = 0; updateDisplay(); }
     function updateSize(s) { state.size = s; updateDisplay(); }
     
+    function stopConfetti() {
+        confettiActive = false;
+        if (confettiAnimId) cancelAnimationFrame(confettiAnimId);
+        const canvas = document.getElementById('confetti');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     function triggerConfetti() {
+        if (confettiActive) return;
+        confettiActive = true;
         const canvas = document.getElementById('confetti');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
@@ -430,6 +408,7 @@
             });
         }
         function draw() {
+            if (!confettiActive) return;
             ctx.clearRect(0,0,canvas.width, canvas.height);
             particles.forEach(p => {
                 ctx.fillStyle = p.color;
@@ -438,15 +417,16 @@
                 ctx.fill();
                 p.y += p.speed;
             });
-            if(particles.length > 0 && particles[0].y < canvas.height) requestAnimationFrame(draw);
+            if(particles.length > 0 && particles[0].y < canvas.height) {
+                confettiAnimId = requestAnimationFrame(draw);
+            } else {
+                confettiActive = false;
+            }
         }
         draw();
     }
 
-    // Auto-load project if it exists in state
-    if (state.project) {
-        loadTracker();
-    }
+    if (state.project) loadTracker();
 </script>
 
 </body>
